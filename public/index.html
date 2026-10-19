@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>视频隐私工作台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <strong>视频隐私工作台</strong>
+        <span>本地脱敏编辑</span>
+      </div>
+    </div>
+    <div class="privacy-badge"><span></span>仅监听本机</div>
+  </header>
+
+  <main class="app-shell">
+    <section id="uploadView" class="upload-view">
+      <div class="upload-copy">
+        <p class="eyebrow">隐私信息脱敏</p>
+        <h1>让画面只保留<br>应该被看见的内容</h1>
+        <p>上传你拥有或已获授权的视频，框选人脸、用户名、手机号等区域，在本机生成脱敏副本。</p>
+        <div class="boundary-note">保留版权、作者及来源标识，不支持第三方平台抓取。</div>
+      </div>
+      <label id="dropZone" class="drop-zone" for="fileInput">
+        <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-matroska,video/x-msvideo">
+        <span class="upload-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+        </span>
+        <strong>选择或拖入视频</strong>
+        <span>MP4、WebM、MOV、MKV、AVI · 最大 200 MB</span>
+        <span class="choose-button">选择文件</span>
+      </label>
+    </section>
+
+    <section id="editorView" class="editor-view" hidden>
+      <aside class="sidebar">
+        <div class="file-block">
+          <span class="section-label">当前视频</span>
+          <strong id="fileName"></strong>
+          <span id="fileMeta"></span>
+          <button id="replaceButton" class="text-button" type="button">更换视频</button>
+        </div>
+
+        <div class="control-block">
+          <div class="control-heading">
+            <span class="section-label">脱敏区域</span>
+            <span id="regionCount" class="count">0</span>
+          </div>
+          <p>在画面上按住并拖动，框选需要隐藏的信息。</p>
+          <div id="regionList" class="region-list"></div>
+        </div>
+
+        <div class="control-block">
+          <span class="section-label">处理方式</span>
+          <div class="segmented" role="group" aria-label="处理方式">
+            <button class="segment active" data-mode="blur" type="button">模糊</button>
+            <button class="segment" data-mode="cover" type="button">遮挡</button>
+          </div>
+        </div>
+
+        <label class="toggle-row">
+          <span><strong>清除文件元数据</strong><small>移除位置、设备和拍摄信息</small></span>
+          <input id="stripMetadata" type="checkbox" checked>
+          <i aria-hidden="true"></i>
+        </label>
+
+        <button id="processButton" class="primary-button" type="button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+          生成脱敏视频
+        </button>
+      </aside>
+
+      <div class="workspace">
+        <div class="workspace-head">
+          <div>
+            <span class="section-label">画面编辑</span>
+            <span id="timeLabel">00:00 / 00:00</span>
+          </div>
+          <button id="deleteRegionButton" class="icon-button" type="button" title="删除选中区域" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/></svg>
+          </button>
+        </div>
+        <div class="stage-wrap">
+          <div id="videoStage" class="video-stage">
+            <video id="sourceVideo" playsinline></video>
+            <div id="overlay" class="overlay"></div>
+          </div>
+        </div>
+        <div class="transport">
+          <button id="playButton" class="icon-button" type="button" title="播放">
+            <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg>
+            <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>
+          </button>
+          <input id="timeline" type="range" min="0" max="1000" value="0" aria-label="视频进度">
+          <button id="muteButton" class="icon-button" type="button" title="静音">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Zm4 4a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultView" class="result-view" hidden>
+      <div class="result-head">
+        <div><p class="eyebrow">处理完成</p><h2>脱敏副本已生成</h2></div>
+        <button id="backButton" class="secondary-button" type="button">返回编辑</button>
+      </div>
+      <video id="resultVideo" controls playsinline></video>
+      <div class="result-actions">
+        <div><strong id="resultName"></strong><span>文件已保存至项目的本地输出目录</span></div>
+        <a id="downloadButton" class="primary-button" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+          下载视频
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div id="busyOverlay" class="busy-overlay" hidden>
+    <div class="spinner"></div>
+    <strong id="busyTitle">正在处理视频</strong>
+    <span id="busyText">耗时取决于视频时长和分辨率，请勿关闭页面</span>
+  </div>
+  <div id="toast" class="toast" role="alert" hidden></div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
