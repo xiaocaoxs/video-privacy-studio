@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: video-privacy-studio
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: MAX_UPLOAD_MB
+        value: 200
+      - key: FILE_TTL_HOURS
+        value: 6
+      - key: RATE_LIMIT
+        value: 20
