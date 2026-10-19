@@ -1,0 +1,20 @@
+{
+  "name": "video-privacy-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local video privacy redaction studio for authorized media",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
